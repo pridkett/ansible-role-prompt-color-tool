@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  author: Your Name
+  author: Patrick Wagstrom
   description: Role to install prompt-color-tool utility
-  company: Your Company
+  company: W2 Research
   license: MIT
   min_ansible_version: 2.9
   platforms:
