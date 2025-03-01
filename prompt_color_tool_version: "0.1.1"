@@ -1,9 +1,5 @@
 
 The version of prompt-color-tool to install.
 
-## Dependencies
-
-None.
-
-## Example Playbook
+You can also override the version by setting the `prompt_color_tool.version` variable outside the role:
 

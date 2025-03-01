@@ -1,6 +1,11 @@
 ---
 # Tasks for installing prompt-color-tool
 
+# Set version from external variable if provided, otherwise use default
+- name: Set prompt-color-tool version
+  ansible.builtin.set_fact:
+    prompt_color_tool_version: "{{ prompt_color_tool.version | default(prompt_color_tool_version) }}"
+
 - name: Include OS-specific variables
   ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
