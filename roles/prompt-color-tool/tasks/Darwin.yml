@@ -11,16 +11,12 @@
     msg: "Homebrew is required but not installed. Please install Homebrew first."
   when: not homebrew_check.stat.exists
 
+- name: Add pridkett/prompt-color-tool tap
+  homebrew_tap:
+    name: pridkett/prompt-color-tool
+    state: present
+
 - name: Install prompt-color-tool via Homebrew
   homebrew:
-    name: prompt-color-tool
+    name: pridkett/prompt-color-tool/prompt-color-tool
     state: present
-    version: "{{ prompt_color_tool_version }}"
-  register: brew_install
-  ignore_errors: true
-
-- name: Install prompt-color-tool via Homebrew cask if formula not available
-  homebrew_cask:
-    name: prompt-color-tool
-    state: present
-  when: brew_install is failed

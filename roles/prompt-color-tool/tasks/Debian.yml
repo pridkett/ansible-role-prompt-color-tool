@@ -1,30 +1,49 @@
 ---
 # Debian specific installation tasks
 
+- name: Set architecture mapping
+  set_fact:
+    arch_mapping:
+      x86_64: "amd64"
+      aarch64: "arm64"
+      armv7l: "armhf"
+
+- name: Set package version suffix for x86_64
+  set_fact:
+    version_suffix: "-1"
+  when: ansible_architecture == "x86_64"
+
+- name: Set package version suffix for other architectures
+  set_fact:
+    version_suffix: ""
+  when: ansible_architecture != "x86_64"
+
+- name: Set architecture for package
+  set_fact:
+    pkg_arch: "{{ arch_mapping[ansible_architecture] | default('amd64') }}"
+
 - name: Check if prompt-color-tool is already installed
-  command: which prompt-color-tool
-  register: prompt_color_tool_check
-  ignore_errors: true
+  command: dpkg-query -W prompt-color-tool
+  register: pkg_check
+  failed_when: false
   changed_when: false
 
-- name: Download prompt-color-tool for Linux
+- name: Download prompt-color-tool Debian package
   get_url:
-    url: "https://github.com/example/prompt-color-tool/releases/download/v{{ prompt_color_tool_version }}/prompt-color-tool-linux-amd64"
-    dest: "/tmp/prompt-color-tool"
-    mode: '0755'
-  when: prompt_color_tool_check.rc != 0
+    url: "https://github.com/pridkett/prompt-color-tool/releases/download/v{{ prompt_color_tool_version }}/prompt-color-tool_{{ prompt_color_tool_version }}{{ version_suffix }}_{{ pkg_arch }}.deb"
+    dest: "/tmp/prompt-color-tool_{{ prompt_color_tool_version }}_{{ pkg_arch }}.deb"
+    mode: '0644'
+  when: pkg_check.rc != 0
 
-- name: Install prompt-color-tool
+- name: Install prompt-color-tool Debian package
   become: true
-  copy:
-    src: "/tmp/prompt-color-tool"
-    dest: "/usr/local/bin/prompt-color-tool"
-    mode: '0755'
-    remote_src: yes
-  when: prompt_color_tool_check.rc != 0
+  apt:
+    deb: "/tmp/prompt-color-tool_{{ prompt_color_tool_version }}_{{ pkg_arch }}.deb"
+    state: present
+  when: pkg_check.rc != 0
 
 - name: Clean up temporary files
   file:
-    path: "/tmp/prompt-color-tool"
+    path: "/tmp/prompt-color-tool_{{ prompt_color_tool_version }}_{{ pkg_arch }}.deb"
     state: absent
-  when: prompt_color_tool_check.rc != 0
+  when: pkg_check.rc != 0

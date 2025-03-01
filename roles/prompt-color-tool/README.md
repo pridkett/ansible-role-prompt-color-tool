@@ -4,7 +4,8 @@ This Ansible role installs the `prompt-color-tool` utility on various platforms.
 
 ## Requirements
 
-None.
+- For macOS: Homebrew must be installed
+- For Debian/Ubuntu: apt package manager
 
 ## Role Variables
 
