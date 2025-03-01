@@ -1,0 +1,30 @@
+---
+# RedHat specific installation tasks
+
+- name: Check if prompt-color-tool is already installed
+  command: which prompt-color-tool
+  register: prompt_color_tool_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Download prompt-color-tool for Linux
+  get_url:
+    url: "https://github.com/example/prompt-color-tool/releases/download/v{{ prompt_color_tool_version }}/prompt-color-tool-linux-amd64"
+    dest: "/tmp/prompt-color-tool"
+    mode: '0755'
+  when: prompt_color_tool_check.rc != 0
+
+- name: Install prompt-color-tool
+  become: true
+  copy:
+    src: "/tmp/prompt-color-tool"
+    dest: "/usr/local/bin/prompt-color-tool"
+    mode: '0755'
+    remote_src: yes
+  when: prompt_color_tool_check.rc != 0
+
+- name: Clean up temporary files
+  file:
+    path: "/tmp/prompt-color-tool"
+    state: absent
+  when: prompt_color_tool_check.rc != 0
