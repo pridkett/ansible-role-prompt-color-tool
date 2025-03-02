@@ -1,15 +1,23 @@
 ---
 # MacOS specific installation tasks
 
-- name: Ensure Homebrew is installed
+- name: Check for Homebrew installation
   stat:
-    path: /usr/local/bin/brew
+    path: "{{ item }}"
+  with_items:
+    - /opt/homebrew/bin/brew
+    - /usr/local/bin/brew
+    - /usr/local/brew
   register: homebrew_check
+
+- name: Determine if Homebrew is installed
+  set_fact:
+    homebrew_installed: "{{ homebrew_check.results | selectattr('stat.exists', 'equalto', true) | list | length > 0 }}"
 
 - name: Fail if Homebrew is not installed
   fail:
     msg: "Homebrew is required but not installed. Please install Homebrew first."
-  when: not homebrew_check.stat.exists
+  when: not homebrew_installed
 
 - name: Add pridkett/prompt-color-tool tap
   homebrew_tap:
