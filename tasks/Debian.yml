@@ -8,6 +8,17 @@
       aarch64: "arm64"
       armv7l: "armhf"
 
+- name: Get dpkg-architecture
+  command: dpkg --print-architecture
+  register: pkg_arch
+  changed_when: false
+
+- name: Overwrite architecture mapping when armhf detected as aarch64
+  set_fact:
+    arch_mapping:
+      aarch64: "armhf"
+  when: pkg_arch.stdout == "armhf"
+
 - name: Set package version suffix for x86_64
   set_fact:
     version_suffix: "-1"
